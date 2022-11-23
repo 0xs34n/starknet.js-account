@@ -5,8 +5,6 @@ const genPrivateKey = stark.randomAddress();
 const starkKeyPair = ec.genKeyPair(genPrivateKey);
 const starkKeyPublic = ec.getStarkKey(starkKeyPair);
 
-const addressSalt = starkKeyPublic;
-
 // Argent Class Hash on Testnet
 // https://testnet.starkscan.co/address-book
 const accountClassHash =
@@ -28,15 +26,26 @@ const accountToBeDeployed = hash.calculateContractAddressFromHash(
   0
 );
 
+// Log these values to console and copy it to the variables below
 // console.log("accountToBeDeployed", accountToBeDeployed);
 // console.log("privateKey", genPrivateKey);
+// console.log("publicKey", starkKeyPublic);
 
 // ==================================================================
 
-const contractAddress = accountToBeDeployed;
+// // WARNING: Do not do this in production.
+const privateKey =
+  "0x0509199998039a7cc58a4bb751754cbd1b990ac812d820040b64faae85122b8a";
+const publicKey =
+  "0x06bb7fd397c9ce5251347a7f6fa5b2f0876c51bc6ef33d321741440a58a055be";
+const contractAddress =
+  "0x484cc3866fcff0d05c35c79b9e0709cc6db197a4318691f24827afd1f7e2f8e";
 
-// WARNING: Do not do this in production.
-const privateKey = genPrivateKey;
+const constructorCallDataDeployed = stark.compileCalldata({
+  implementation: accountClassHash,
+  selector: hash.getSelectorFromName("initialize"),
+  calldata: stark.compileCalldata({ signer: publicKey, guardian: "0" }),
+});
 
 const account = new Account(
   defaultProvider,
@@ -46,9 +55,9 @@ const account = new Account(
 
 const { transaction_hash, contract_address } = await account.deployAccount({
   classHash: argentProxyClassHash,
-  constructorCalldata: stark.compileCalldata(constructorCallData),
+  constructorCalldata: constructorCallDataDeployed,
   contractAddress: contractAddress,
-  addressSalt: addressSalt,
+  addressSalt: publicKey,
 });
 
 console.log(
