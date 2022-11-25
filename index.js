@@ -1,8 +1,7 @@
-import { ec, stark, hash, number, Account, defaultProvider } from "starknet";
+import { ec, stark, hash, Account, Provider } from "starknet";
+import readline from "readline";
 
-const genPrivateKey = stark.randomAddress();
-
-const starkKeyPair = ec.genKeyPair(genPrivateKey);
+const starkKeyPair = ec.genKeyPair();
 const starkKeyPublic = ec.getStarkKey(starkKeyPair);
 
 // Argent Class Hash on Testnet
@@ -12,74 +11,79 @@ const accountClassHash =
 const argentProxyClassHash =
   "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
 
-const constructorCallDataPre = stark.compileCalldata({
+const constructorCallData = stark.compileCalldata({
   implementation: accountClassHash,
   selector: hash.getSelectorFromName("initialize"),
   calldata: stark.compileCalldata({ signer: starkKeyPublic, guardian: "0" }),
 });
 
 // to be deployed account contract address
-const accountToBeDeployed = hash.calculateContractAddressFromHash(
+const contractAddress = hash.calculateContractAddressFromHash(
   starkKeyPublic, // salt
   argentProxyClassHash,
-  constructorCallDataPre,
+  constructorCallData,
   0
 );
 
-// Log these values to console and copy it to the variables below
-console.log("privateKey", genPrivateKey);
-console.log("publicKey", starkKeyPublic);
-console.log("accountToBeDeployed", accountToBeDeployed);
-console.log("callData", constructorCallDataPre);
+console.log(
+  `\nPre-calculated account contract address:\n\n${contractAddress}\n`
+);
 
-// ==================================================================
+const userInput = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
-// // WARNING: Do not do this in production.
-const privateKey =
-  "0x01b9352cf42746fe5776dbf104b20632c563d6a1d9cd1d7e5855e242b515c76d";
-const publicKey =
-  "0x073d53e7e31c66c8b894ccffbf1846391a4d157f57edc35082c77b639a1fa77d";
-const contractAddress =
-  "0x63ecac301a6d2b78f7090a700e185893c722fb988260ce667390e593c60d7f1";
-const constructorCallData = [
-  "1449178161945088530446351771646113898511736767359683664273252560520029776866",
-  "215307247182100370520050591091822763712463273430149262739280891880522753123",
-  "2",
-  "3274546707646383799600510394057987552042180904849357647877980067971301615485",
-  "0",
-];
+let isFunded = false;
 
-const keyPair = ec.getKeyPair(privateKey);
+while (!isFunded) {
+  await new Promise((resolve) => {
+    userInput.question(
+      `StarkNet requires a fee to deploy accounts. \nPlease send nominal funds to the to the pre-calculated account contract above. \nIs the account contract funded? (y/n)`,
+      (isFundedInput) => {
+        if (isFundedInput === "y") {
+          isFunded = true;
+          userInput.close();
+          resolve();
+        } else {
+          console.log(
+            "Please send funds to the account contract and try again."
+          );
+          resolve();
+        }
+      }
+    );
+  });
+}
 
-const account = new Account(defaultProvider, contractAddress, keyPair);
+const account = new Account(
+  new Provider({
+    // use testnet-1
+    sequencer: {
+      baseUrl: "https://alpha4.starknet.io",
+      feederGatewayUrl: "feeder_gateway",
+      gatewayUrl: "gateway",
+    },
+  }),
+  contractAddress,
+  starkKeyPair
+);
 
 const deployAccountPayload = {
   classHash: argentProxyClassHash,
   constructorCalldata: constructorCallData,
   contractAddress: contractAddress,
-  addressSalt: publicKey,
+  addressSalt: starkKeyPublic,
 };
-
-const calculatedAccountAddress = hash.calculateContractAddressFromHash(
-  deployAccountPayload.addressSalt,
-  deployAccountPayload.classHash,
-  deployAccountPayload.constructorCalldata,
-  0
-);
-
-console.log(
-  "is the calculated address the same as the deployed address?",
-  number.hexToDecimalString(calculatedAccountAddress) ===
-    number.hexToDecimalString(contractAddress)
-);
 
 const { transaction_hash, contract_address } = await account.deployAccount(
   deployAccountPayload
 );
 
+console.log(`\nAccount contract deployment in progress...\n`);
 console.log(
-  "deployAccountTx",
-  transaction_hash,
-  "contract address",
-  contract_address
+  `Check deployment transaction status at \n\nhttps://testnet.starkscan.co/tx/${transaction_hash}\n`
+);
+console.log(
+  `Once the transaction is confirmed. The account is deployed at \n\nhttps://testnet.starkscan.co/tx/${contract_address}\n`
 );
