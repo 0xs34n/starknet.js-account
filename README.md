@@ -2,9 +2,11 @@
 
 This tutorial will walk you through the process of creating a StarkNet account throught Starknet.js.
 
-## Source Code
+## What's new?
 
-Deploying accounts now require fees as of 0.10.2. Therefore, the process of creating an account is as follows:
+Deploying accounts now **require fees** as of StarkNet v0.10.2.
+
+Therefore, the process of creating an account is as follows:
 
 1. Calculate the account contract address before hand.
 2. Send some funds to the account contract address.
