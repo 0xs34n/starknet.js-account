@@ -29,6 +29,7 @@ console.log(
   `\nPre-calculated account contract address:\n\n${contractAddress}\n`
 );
 
+// User input to check if the account contract is funded
 const userInput = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -56,18 +57,16 @@ while (!isFunded) {
   });
 }
 
-const account = new Account(
-  new Provider({
-    // use testnet-1
-    sequencer: {
-      baseUrl: "https://alpha4.starknet.io",
-      feederGatewayUrl: "feeder_gateway",
-      gatewayUrl: "gateway",
-    },
-  }),
-  contractAddress,
-  starkKeyPair
-);
+// use testnet-1 provider
+const testnetOneProvider = new Provider({
+  sequencer: {
+    baseUrl: "https://alpha4.starknet.io",
+    feederGatewayUrl: "feeder_gateway",
+    gatewayUrl: "gateway",
+  },
+});
+
+const account = new Account(testnetOneProvider, contractAddress, starkKeyPair);
 
 const deployAccountPayload = {
   classHash: argentProxyClassHash,

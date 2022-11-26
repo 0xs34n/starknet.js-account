@@ -26,6 +26,11 @@ Once that's done you can deploy the account contract!
 
 ## References
 
+- [PDF Slides](https://github.com/0xs34n/starknet.js-account/blob/main/Starknet.js%20Updated%20for%20v0.10.2.pdf)
+- [Starknet.js](https://github.com/0xs34n/starknet.js)
+- [Old Starknet.js Tutorial](https://github.com/0xs34n/starknet.js-workshop)
+- [Argent X](https://github.com/argentlabs/argent-x)
+
 Refer to the pdf slides for more information on Starknet.js and StarkNet.
 
 ## Improvements
