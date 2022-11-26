@@ -31,8 +31,6 @@ Once that's done you can deploy the account contract!
 - [Old Starknet.js Tutorial](https://github.com/0xs34n/starknet.js-workshop)
 - [Argent X](https://github.com/argentlabs/argent-x)
 
-Refer to the pdf slides for more information on Starknet.js and StarkNet.
-
 ## Improvements
 
 - Deploy other types of contracts like the openZepplin account contract.
