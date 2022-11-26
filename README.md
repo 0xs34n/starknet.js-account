@@ -1,8 +1,8 @@
-## Starknet.js Account Tutorial
+# Starknet.js Account Tutorial
 
 This tutorial will walk you through the process of creating a StarkNet account throught Starknet.js.
 
-#### Source Code
+## Source Code
 
 Deploying accounts now require fees as of 0.10.2. Therefore, the process of creating an account is as follows:
 
@@ -10,7 +10,7 @@ Deploying accounts now require fees as of 0.10.2. Therefore, the process of crea
 2. Send some funds to the account contract address.
 3. Deploy the funded account contract.
 
-#### How to run this code on testnet-1
+## How to run this code on testnet-1
 
 Use a modern version of Node.js (>= 16.0.0) and run the following commands:
 
@@ -22,11 +22,11 @@ It will print the account contract address and wait for you to send some funds t
 
 Once that's done you can deploy the account contract!
 
-#### References
+## References
 
 Refer to the pdf slides for more information on Starknet.js and StarkNet.
 
-#### Improvements
+## Improvements
 
 - Deploy other types of contracts like the openZepplin account contract.
 - Deploy on other networks like `testnet-2` and `mainnet`.
